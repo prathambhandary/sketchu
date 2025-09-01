@@ -124,17 +124,17 @@
     .field label{font-size:12px;color:var(--muted)}
     .field input,.field select{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text)}
     .divider{height:1px;background:var(--line);margin:12px 0}
-
+    
     /* Footer */
     .footer{padding:24px;text-align:center;color:var(--muted)}
-
+    
     /* Show/hide views */
     #view-lobby:checked ~ .container .view--lobby{display:block}
     #view-lobby:checked ~ .container .view--game{display:none}
     #view-game:checked  ~ .container .view--lobby{display:none}
     #view-game:checked  ~ .container .view--game{display:block}
     .view{display:none}
-
+    
     /* Scrollbars (WebKit) */
     ::-webkit-scrollbar{height:10px;width:10px}
     ::-webkit-scrollbar-thumb{background:#2a2e57;border:2px solid #0f1220;border-radius:999px}
@@ -142,6 +142,21 @@
   </style>
 </head>
 <body>
+
+
+
+  <!-- This Here to show you how this is supposed to work -->
+  <!-- Modify this based on your needs -->
+  <!-- --Pratham -->
+  <h2>Chat</h2>
+  <input id="msg" autocomplete="off">
+  <button onclick="sendMessage()">Send</button>
+  <ul id="messages"></ul>
+
+
+
+
+
   <!-- Preview-only view toggles (replace with JS routes later) -->
   <div class="header">
     <div class="logo">
@@ -325,14 +340,42 @@
               <button class="btn" disabled>Send</button>
             </div>
           </div>
+          
         </aside>
       </div>
     </section>
 
   </div>
 
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <!-- Code injected by live-server -->
 <script>
+  // This is related to socket and io for chatting
+  // Edit this based on your requirements
+  // --Pratham
+  // -- keep this for your app --
+var socket = io();
+
+socket.on("message", function(data) {
+  // data is {sid, msg}
+  let li = document.createElement("li");
+  li.innerText = `[${data.sid.slice(0,4)}] ${data.msg}`;
+  document.querySelector("#messages").appendChild(li); // FIXED selector
+});
+
+
+function sendMessage() {
+  let msg = document.getElementById("msg").value;
+  if (msg.trim() !== "") {
+    socket.send(msg);
+    document.getElementById("msg").value = "";
+  }
+}
+
+
+
+    
 	// <![CDATA[  <-- For SVG support
 	if ('WebSocket' in window) {
 		(function () {
@@ -353,11 +396,12 @@
 			}
 			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
 			var address = protocol + window.location.host + window.location.pathname + '/ws';
-			var socket = new WebSocket(address);
-			socket.onmessage = function (msg) {
-				if (msg.data == 'reload') window.location.reload();
-				else if (msg.data == 'refreshcss') refreshCSS();
-			};
+			var reloadSocket = new WebSocket(address);
+      reloadSocket.onmessage = function (msg) {
+        if (msg.data == 'reload') window.location.reload();
+        else if (msg.data == 'refreshcss') refreshCSS();
+      };
+
 			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
 				console.log('Live reload enabled.');
 				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
@@ -367,6 +411,8 @@
 	else {
 		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
 	}
+
+
 	// ]]>
 </script>
 </body>
