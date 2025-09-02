@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sketchu — Draw & Guess</title>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script></head>
+<body>
+
+  <h1>Create Room</h1>
+  
+  <label for="name">Name for the room: </label>
+  <input type="text" id="roomName" placeholder="Enter room name" />
+  <button onclick="createRoom()">Create</button>
+
+  <h1>Join Room</h1>
+  
+  <label for="name">Name of the room: </label>
+  <input type="text" id="roomNameToJoin" placeholder="Enter room name" />
+  <label for="name">Name of the user: </label>
+  <input type="text" id="userNameToJoin" placeholder="Enter user name" />
+  <button onclick="joinRoom()">Join</button>
+
+  <p id="status"></p>
+
+  <script>
+    const socket = io();
+
+    function createRoom() {
+      const name = document.getElementById("roomName").value.trim();
+      if (!name) {
+        document.getElementById("status").innerText = "⚠️ Please enter a room name.";
+        return;
+      }
+
+      // emit event to server
+      socket.emit("create_room", { name: name });
+    }
+
+    // listen for confirmation from server
+    socket.on("room_created", (data) => {
+      const statusEl = document.getElementById("status");
+      if (data.success) {
+        statusEl.innerText = `✅ Room created! ID: ${data.room_id}, Name: ${data.name}`;
+        console.log("Room created:", data);
+      } else {
+        statusEl.innerText = `❌ Failed to create room: ${data.error}`;
+        console.error("Failed:", data.error);
+      }
+    });
+
+    function joinRoom() {
+      const roomName = document.getElementById("roomNameToJoin").value.trim();
+      const name = document.getElementById("userNameToJoin").value.trim();
+      if (!name || !roomName) {
+        document.getElementById("status").innerText = "⚠️ Please enter both room name and user name.";
+        return;
+        }
+
+
+      // emit event to server
+      socket.emit("join_room", { name: name, room: roomName });
+    }
+
+    socket.on("added_to_room", (data) => {
+    const statusEl = document.getElementById("status");
+    if (data.success) {
+        statusEl.innerText = `✅ Joined room! Room: ${data.room_id}, Name: ${data.name}`;
+        console.log("Joined:", data);
+    } else {
+        statusEl.innerText = `❌ Failed to join room: ${data.error}`;
+        console.error("Failed:", data.error);
+    }
+    });
+
+  </script>
+</body>
+</html>
