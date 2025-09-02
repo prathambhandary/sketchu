@@ -152,6 +152,10 @@
   <input id="msg" autocomplete="off">
   <button onclick="sendMessage()">Send</button>
   <ul id="messages"></ul>
+  
+  <form action="/make-room">
+    <input type="submit" value="make room">
+  </form>
 
 
 
@@ -364,7 +368,7 @@ socket.on("message", function(data) {
   document.querySelector("#messages").appendChild(li); // FIXED selector
 });
 
-  
+
 function sendMessage() {
   let msg = document.getElementById("msg").value;
   if (msg.trim() !== "") {
